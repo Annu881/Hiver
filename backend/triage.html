@@ -1351,24 +1351,19 @@
     <div class="glass-card">
       <div class="gc-body">
         <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">
-          <tr style="border-bottom:1px solid var(--br); color:var(--t3);">
-            <th style="padding:12px">Ticket ID</th>
-            <th style="padding:12px">Time</th>
-            <th style="padding:12px">Outcome</th>
-            <th style="padding:12px">Intent</th>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-            <td style="padding:12px; font-family:var(--mono);">#t_1184</td>
-            <td style="padding:12px; color:var(--t2);">2 mins ago</td>
-            <td style="padding:12px"><span class="chip chip-green">Auto-Replied</span></td>
-            <td style="padding:12px; color:var(--t2);">Update Issue</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-            <td style="padding:12px; font-family:var(--mono);">#t_1185</td>
-            <td style="padding:12px; color:var(--t2);">6 mins ago</td>
-            <td style="padding:12px"><span class="chip chip-amber">Escalated</span></td>
-            <td style="padding:12px; color:var(--t2);">Hardware Damage</td>
-          </tr>
+          <thead style="border-bottom:1px solid var(--br); color:var(--t3);">
+            <tr>
+              <th style="padding:12px">Ticket ID</th>
+              <th style="padding:12px">Time</th>
+              <th style="padding:12px">Outcome</th>
+              <th style="padding:12px">Intent</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody">
+            <tr>
+              <td colspan="4" style="padding:24px; text-align:center; color:var(--t3); font-style:italic;">No tickets processed yet.</td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -1673,13 +1668,34 @@
     </div>`).join('') : `<div style="color:var(--t3);font-family:var(--mono);font-size:11px">—</div>`;
     }
 
+        /* ── DECISION LOGGING ── */
+    function addToLog(item, outcomeStr) {
+      const tb = document.getElementById('logTableBody');
+      if(!tb) return;
+      if (tb.innerHTML.includes("No tickets processed yet")) { tb.innerHTML = ''; }
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      const intentStr = item.state && item.state.intent_scores ? Object.keys(item.state.intent_scores)[0]?.replace(/_/g,' ') || 'Unknown' : 'Unknown';
+      const badge = outcomeStr === 'Auto-Replied' ? '<span class="chip chip-green">Auto-Replied</span>' : '<span class="chip chip-amber">Escalated</span>';
+      tb.innerHTML = `
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+          <td style="padding:12px; font-family:var(--mono);">${item.id}</td>
+          <td style="padding:12px; color:var(--t2);">${time}</td>
+          <td style="padding:12px">${badge}</td>
+          <td style="padding:12px; color:var(--t2); text-transform:capitalize;">${intentStr}</td>
+        </tr>
+      ` + tb.innerHTML;
+    }
+
     /* ── ACTIONS ── */
     function sendReply() {
       const txt = document.getElementById('draftBox')?.textContent?.trim();
       if (!txt) { toast('Draft is empty', 'error'); return; }
       const item = queue.find(q => q.id === activeId);
       if (!item) return;
+      
+      addToLog(item, 'Auto-Replied');
       toast(`✓ Reply sent to ${item.handle}`, 'success');
+      
       queue = queue.filter(q => q.id !== activeId);
       activeId = queue[0]?.id || null;
       renderQueue();
@@ -1692,6 +1708,7 @@
     }
 
     async function regenReply(id) {
+
       const item = queue.find(q => q.id === id);
       if (!item || item.working) return;
       item.state = null;
@@ -1701,10 +1718,19 @@
     function escalateTicket() {
       const item = queue.find(q => q.id === activeId);
       if (!item) return;
-      item.state = { ...item.state, escalated: true };
+      
+      addToLog(item, 'Escalated');
       toast(`↗ Escalated ${item.handle} to human agent`, 'info');
+      
+      queue = queue.filter(q => q.id !== activeId);
+      activeId = queue[0]?.id || null;
       renderQueue();
-      renderStage(item);
+      if (activeId) selectTicket(activeId);
+      else {
+        document.getElementById('stageScroll').innerHTML = `<div class="empty-stage"><div class="big-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(240,80,80,.5)" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h3 style="color:var(--a)">Queue Clear</h3><p style="font-size:13px">All tickets handled</p></div>`;
+        document.getElementById('evList').innerHTML = '';
+        document.getElementById('traceList').innerHTML = '';
+      }
     }
 
     /* ── VIEW SWITCH ── */
