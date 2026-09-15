@@ -1308,6 +1308,37 @@
           <p style="font-size:11px;font-family:var(--mono);margin-top:4px">↑↓ arrow keys to navigate</p>
         </div>
       </div>
+      <!-- STICKY REPLY FOOTER always visible inside stage -->
+      <div id="replyFooter"
+        style="display:none; flex-shrink:0; border-top:1px solid var(--br); background:var(--bg); padding:12px 20px;">
+        <div class="reply-foot" style="padding:0;">
+          <button class="btn btn-prim" id="sendBtn" onclick="sendReply()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            Send Reply
+          </button>
+          <button class="btn btn-ghost" id="regenBtn" onclick="regenReply(activeId)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+            </svg>
+            Regenerate
+          </button>
+          <div class="spacer"></div>
+          <span class="char-count" id="charCount">0 chars</span>
+          <button class="btn btn-danger" onclick="escalateTicket()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="17 11 21 7 17 3" />
+              <line x1="21" y1="7" x2="9" y2="7" />
+              <polyline points="7 21 3 17 7 13" />
+              <line x1="15" y1="17" x2="3" y2="17" />
+            </svg>
+            Route to Agent
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- EVIDENCE PANEL -->
