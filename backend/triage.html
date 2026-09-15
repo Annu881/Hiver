@@ -1327,66 +1327,67 @@
     </div>
 
 
-  <!-- EVALUATION VIEW -->
-  <div class="view-panel" id="view-eval">
-    <div class="view-title">Evaluation Metrics</div>
-    <div class="view-sub">Performance report of the ML Intent Classifier and Gemini Generator.</div>
-    
-    <div class="row2">
-      <div class="glass-card">
-        <div class="gc-head">Intent Classifier Accuracy</div>
-        <div class="gc-body" style="font-size:36px; color:var(--g); font-weight:700;">97.4%</div>
-      </div>
-      <div class="glass-card">
-        <div class="gc-head">Avg Latency</div>
-        <div class="gc-body" style="font-size:36px; color:var(--p2); font-weight:700;">385ms</div>
+    <!-- EVALUATION VIEW -->
+    <div class="view-panel" id="view-eval">
+      <div class="view-title">Evaluation Metrics</div>
+      <div class="view-sub">Performance report of the ML Intent Classifier and Gemini Generator.</div>
+
+      <div class="row2">
+        <div class="glass-card">
+          <div class="gc-head">Intent Classifier Accuracy</div>
+          <div class="gc-body" style="font-size:36px; color:var(--g); font-weight:700;">97.4%</div>
+        </div>
+        <div class="glass-card">
+          <div class="gc-head">Avg Latency</div>
+          <div class="gc-body" style="font-size:36px; color:var(--p2); font-weight:700;">385ms</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- DECISION LOG VIEW -->
-  <div class="view-panel" id="view-log">
-    <div class="view-title">Decision Log</div>
-    <div class="view-sub">Audit trail of all AI-handled vs manually escalated tickets.</div>
-    <div class="glass-card">
-      <div class="gc-body">
-        <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">
-          <thead style="border-bottom:1px solid var(--br); color:var(--t3);">
-            <tr>
-              <th style="padding:12px">Ticket ID</th>
-              <th style="padding:12px">Time</th>
-              <th style="padding:12px">Outcome</th>
-              <th style="padding:12px">Intent</th>
-            </tr>
-          </thead>
-          <tbody id="logTableBody">
-            <tr>
-              <td colspan="4" style="padding:24px; text-align:center; color:var(--t3); font-style:italic;">No tickets processed yet.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS VIEW -->
-  <div class="view-panel" id="view-settings">
-    <div class="view-title">System Settings</div>
-    <div class="view-sub">Configure AI thresholds and UI preferences.</div>
-    
-    <div style="max-width:500px">
-      <div class="glass-card" style="margin-bottom:20px">
-        <div class="gc-head">AI Thresholds</div>
+    <!-- DECISION LOG VIEW -->
+    <div class="view-panel" id="view-log">
+      <div class="view-title">Decision Log</div>
+      <div class="view-sub">Audit trail of all AI-handled vs manually escalated tickets.</div>
+      <div class="glass-card">
         <div class="gc-body">
-          <div style="margin-bottom:12px">
-            <div style="font-size:14px; margin-bottom:8px">Intent Confidence Gate</div>
-            <input type="range" min="0" max="100" value="75" style="width:100%">
-            <div style="font-family:var(--mono); color:var(--t3); font-size:11px; margin-top:4px">Current: 0.75</div>
+          <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">
+            <thead style="border-bottom:1px solid var(--br); color:var(--t3);">
+              <tr>
+                <th style="padding:12px">Ticket ID</th>
+                <th style="padding:12px">Time</th>
+                <th style="padding:12px">Outcome</th>
+                <th style="padding:12px">Intent</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <tr>
+                <td colspan="4" style="padding:24px; text-align:center; color:var(--t3); font-style:italic;">No tickets
+                  processed yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div class="view-panel" id="view-settings">
+      <div class="view-title">System Settings</div>
+      <div class="view-sub">Configure AI thresholds and UI preferences.</div>
+
+      <div style="max-width:500px">
+        <div class="glass-card" style="margin-bottom:20px">
+          <div class="gc-head">AI Thresholds</div>
+          <div class="gc-body">
+            <div style="margin-bottom:12px">
+              <div style="font-size:14px; margin-bottom:8px">Intent Confidence Gate</div>
+              <input type="range" min="0" max="100" value="75" style="width:100%">
+              <div style="font-family:var(--mono); color:var(--t3); font-size:11px; margin-top:4px">Current: 0.75</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </div><!-- .app -->
 
   <div id="toast">
@@ -1421,25 +1422,25 @@
     const SIMULATED_HANDLES = ["@josh_d", "@samantha_99", "@tech_guy22", "@anna_banana", "@crypto_bro", "@lisalisa"];
 
     function simulateNewTicket() {
-  let customText = prompt("Type a custom tweet for the support agent:", "");
-  if (customText === null || customText.trim() === "") {
-    customText = SIMULATED_TWEETS[Math.floor(Math.random() * SIMULATED_TWEETS.length)];
-  }
-  const t = {
-    id: `t_${tCounter++}`,
-    handle: SIMULATED_HANDLES[Math.floor(Math.random() * SIMULATED_HANDLES.length)],
-    ts: 'Just now',
-    text: customText,
-    state: null,
-    working: false
-  };
-  queue.unshift(t);
-  const searchInput = document.getElementById('searchInput');
-  renderQueue(searchInput ? searchInput.value : '');
-  toast(`New ticket from ${t.handle}`, 'info');
-}
+      let customText = prompt("Type a custom tweet for the support agent:", "");
+      if (customText === null || customText.trim() === "") {
+        customText = SIMULATED_TWEETS[Math.floor(Math.random() * SIMULATED_TWEETS.length)];
+      }
+      const t = {
+        id: `t_${tCounter++}`,
+        handle: SIMULATED_HANDLES[Math.floor(Math.random() * SIMULATED_HANDLES.length)],
+        ts: 'Just now',
+        text: customText,
+        state: null,
+        working: false
+      };
+      queue.unshift(t);
+      const searchInput = document.getElementById('searchInput');
+      renderQueue(searchInput ? searchInput.value : '');
+      toast(`New ticket from ${t.handle}`, 'info');
+    }
 
-/* ── TOAST ── */
+    /* ── TOAST ── */
     function toast(msg, type = 'success') {
       const el = document.getElementById('toast');
       const icon = document.getElementById('toastIcon');
@@ -1611,23 +1612,14 @@
       <div class="gc-body">
         <div class="reply-editor" id="draftBox" contenteditable="${isAuto}" onkeyup="updateCharCount()">${s.reply || ''}</div>
       </div>
-      <div class="reply-foot">
-        <button class="btn btn-prim" ${!isAuto ? 'disabled' : ''} onclick="sendReply()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Send Reply
-        </button>
-        <button class="btn btn-ghost" onclick="regenReply('${item.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Regenerate
-        </button>
-        <div class="spacer"></div>
-        <span class="char-count" id="charCount">${(s.reply || '').length} chars</span>
-        <button class="btn btn-danger" onclick="escalateTicket()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="15" y1="17" x2="3" y2="17"/></svg>
-          Route to Agent
-        </button>
-      </div>
     </div>`;
+      // Show sticky footer and update its state
+      const replyFooter = document.getElementById('replyFooter');
+      const sendBtn = document.getElementById('sendBtn');
+      const cc = document.getElementById('charCount');
+      if (replyFooter) replyFooter.style.display = 'block';
+      if (sendBtn) sendBtn.disabled = !isAuto;
+      if (cc) cc.textContent = (s.reply || '').length + ' chars';
     }
 
     function updateCharCount() {
@@ -1673,13 +1665,13 @@
     </div>`).join('') : `<div style="color:var(--t3);font-family:var(--mono);font-size:11px">—</div>`;
     }
 
-        /* ── DECISION LOGGING ── */
+    /* ── DECISION LOGGING ── */
     function addToLog(item, outcomeStr) {
       const tb = document.getElementById('logTableBody');
-      if(!tb) return;
+      if (!tb) return;
       if (tb.innerHTML.includes("No tickets processed yet")) { tb.innerHTML = ''; }
-      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      const intentStr = item.state && item.state.intent_scores ? Object.keys(item.state.intent_scores)[0]?.replace(/_/g,' ') || 'Unknown' : 'Unknown';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const intentStr = item.state && item.state.intent_scores ? Object.keys(item.state.intent_scores)[0]?.replace(/_/g, ' ') || 'Unknown' : 'Unknown';
       const badge = outcomeStr === 'Auto-Replied' ? '<span class="chip chip-green">Auto-Replied</span>' : '<span class="chip chip-amber">Escalated</span>';
       tb.innerHTML = `
         <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
@@ -1697,10 +1689,10 @@
       if (!txt) { toast('Draft is empty', 'error'); return; }
       const item = queue.find(q => q.id === activeId);
       if (!item) return;
-      
+
       addToLog(item, 'Auto-Replied');
       toast(`✓ Reply sent to ${item.handle}`, 'success');
-      
+
       queue = queue.filter(q => q.id !== activeId);
       activeId = queue[0]?.id || null;
       renderQueue();
@@ -1723,10 +1715,10 @@
     function escalateTicket() {
       const item = queue.find(q => q.id === activeId);
       if (!item) return;
-      
+
       addToLog(item, 'Escalated');
       toast(`↗ Escalated ${item.handle} to human agent`, 'info');
-      
+
       queue = queue.filter(q => q.id !== activeId);
       activeId = queue[0]?.id || null;
       renderQueue();
@@ -1759,6 +1751,8 @@
         s.classList.remove('hide');
         e.classList.remove('hide');
       } else {
+        const rf = document.getElementById('replyFooter');
+        if (rf) rf.style.display = 'none';
         document.getElementById('view-' + view).classList.add('active');
       }
     }
