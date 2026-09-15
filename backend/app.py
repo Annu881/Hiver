@@ -149,7 +149,7 @@ def handle_chat(req: ChatRequest):
         return ChatResponse(reply=f"Error: {e}", intent="Error", escalated=True, retrieved_evidence=0)
 
 # ---- Serve the Triage Console HTML at root ----
-FRONTEND_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend", "triage.html")
+FRONTEND_PATH = os.path.join(os.path.dirname(__file__), "triage.html")
 
 @app.get("/")
 def serve_frontend():
