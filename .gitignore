@@ -1,0 +1,11 @@
+venv/
+node_modules/
+models/
+*.csv
+twcs/
+customer-support-on-twitter.zip
+__pycache__/
+.env
+.DS_Store
+dist/
+build/
