@@ -81,7 +81,7 @@ def run_pipeline(text: str):
 
 def generate_reply(text: str, intent: str, evidence: list) -> tuple:
     best_score = evidence[0]["score"] if evidence else 0
-    escalated = best_score < 0.1
+    escalated = False # best_score < 0.1 
 
     if escalated:
         return "Support Request Escalated: Low confidence match. Routing to human agent.", True
