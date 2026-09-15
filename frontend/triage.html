@@ -3,663 +3,397 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Triage Console — Hiver AI · @AppleSupport</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Hiver | Triage Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#090d0b;
-  --surface:#0f1510;
-  --card:#141c12;
-  --border:#1e2b1c;
-  --border2:#273524;
-  --txt:#d8e8d4;
-  --txtmid:#8fab89;
-  --txtfaint:#4d6349;
-  --green:#5ff04d;
-  --green2:#3db035;
-  --amber:#f0a832;
-  --red:#f05c52;
-  --violet:#9b7cf0;
-  --mono:'JetBrains Mono',monospace;
+  --brand:#4c33f7; /* Hiver Purple */
+  --brand-light:#ece9fe;
+  --brand-hover:#3f28d8;
+  
+  --bg:#f8f9fa;
+  --surface:#ffffff;
+  --border:#e2e8f0;
+  --border-strong:#cbd5e1;
+  
+  --text-main:#0f172a;
+  --text-muted:#64748b;
+  --text-faint:#94a3b8;
+  
+  --success:#22c55e;
+  --success-bg:#dcfce7;
+  --warning:#f59e0b;
+  --warning-bg:#fef3c7;
+  --danger:#ef4444;
+  --danger-bg:#fee2e2;
+
   --sans:'Inter',sans-serif;
+  --mono:'Fira Code',monospace;
 }
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:6px}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:var(--sans); color:var(--text-main); background:var(--bg); height:100vh; overflow:hidden; font-size:14px; -webkit-font-smoothing:antialiased; }
 
-/* === LAYOUT === */
-.app{display:grid;grid-template-rows:52px 1fr;height:100vh}
-.topbar{display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--border2);position:relative;z-index:50}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--green),var(--green2));display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:12px;color:#060d05;box-shadow:0 0 16px rgba(95,240,77,0.3)}
-.logo-text{font-weight:600;font-size:15px;letter-spacing:-.3px}
-.logo-text span{color:var(--green)}
-.badge{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--border2);border-radius:999px;padding:3px 10px;color:var(--txtmid)}
-.spacer{flex:1}
-.tabs{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:3px}
-.tabs button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:none;border:0;color:var(--txtfaint);padding:6px 14px;border-radius:6px;cursor:pointer;transition:.15s;white-space:nowrap}
-.tabs button:hover{color:var(--txtmid)}
-.tabs button.active{background:var(--green);color:#060d05;font-weight:700}
-.status{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:blink 2s infinite}
-.dot.live{background:var(--green)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* LAYOUT */
+.app-container { display:flex; height:100vh; }
 
-/* === MAIN 3-COL === */
-.main{display:grid;grid-template-columns:300px 1fr 280px;height:calc(100vh - 52px);overflow:hidden}
-.col{height:100%;overflow-y:auto;border-right:1px solid var(--border2)}
-.col:last-child{border-right:none}
-.col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--surface);position:sticky;top:0;z-index:10}
-.col-head h3{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--txtmid);font-weight:500}
-.col-head span{font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
+/* SIDEBAR LEFT */
+.sidebar { width:260px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+.logo-area { padding:20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); }
+.logo-icon { width:28px; height:28px; background:var(--brand); border-radius:6px; display:flex; align-items:center; justify-content:center; }
+.logo-icon svg { width:16px; height:16px; fill:#fff; }
+.logo-text { font-weight:700; font-size:18px; color:var(--text-main); letter-spacing:-0.5px; }
 
-/* === QUEUE === */
-.qitem{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);padding:14px 16px;cursor:pointer;color:inherit;font-family:inherit;transition:.15s;position:relative}
-.qitem:hover{background:rgba(255,255,255,.03)}
-.qitem.active{background:rgba(95,240,77,.05);border-left:2px solid var(--green)}
-.qitem.active .q-handle{color:var(--green)}
-.q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.q-handle{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--txtmid)}
-.q-time{font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
-.q-text{font-size:12.5px;line-height:1.5;color:var(--txt);opacity:.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
-.q-tags{display:flex;gap:5px;flex-wrap:wrap}
-.tag{font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--txtmid)}
-.tag.auto{border-color:rgba(95,240,77,.4);color:var(--green);background:rgba(95,240,77,.08)}
-.tag.esc{border-color:rgba(240,168,50,.4);color:var(--amber);background:rgba(240,168,50,.08)}
-.tag.working{border-color:rgba(155,124,240,.4);color:var(--violet);background:rgba(155,124,240,.08)}
+.nav-menu { padding:16px 12px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.nav-item { padding:10px 14px; border-radius:8px; color:var(--text-muted); font-weight:500; cursor:pointer; display:flex; align-items:center; gap:10px; transition:0.2s; }
+.nav-item:hover { background:var(--bg); color:var(--text-main); }
+.nav-item.active { background:var(--brand); color:#fff; }
+.nav-item svg { width:18px; height:18px; opacity:0.8; }
 
-/* === STAGE (centre) === */
-.stage{display:flex;flex-direction:column;gap:0;height:100%;overflow-y:auto}
-.stage-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--txtfaint);font-family:var(--mono);font-size:12px}
+/* INBOX QUEUE */
+.inbox-panel { width:340px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+.panel-header { padding:18px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.panel-title { font-weight:600; font-size:16px; color:var(--text-main); }
+.badge { background:var(--brand-light); color:var(--brand); font-size:12px; font-weight:600; padding:2px 8px; border-radius:99px; }
 
-.card{border-bottom:1px solid var(--border2)}
-.card-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
-.card-head h4{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--txtmid)}
-.card-body{padding:18px}
+.ticket-list { overflow-y:auto; flex:1; }
+.ticket { padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer; transition:0.15s; position:relative; }
+.ticket:hover { background:var(--bg); }
+.ticket.selected { background:#f4f3ff; border-left:3px solid var(--brand); padding-left:17px; }
+.t-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.t-handle { font-weight:600; font-size:14px; color:var(--text-main); }
+.t-time { font-size:12px; color:var(--text-faint); font-weight:500; }
+.t-snippet { font-size:13px; color:var(--text-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.t-tags { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
 
-/* message */
-.msg-from{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.avatar{width:30px;height:30px;border-radius:8px;background:var(--card);border:1px solid var(--border2);display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--txtmid);flex:none}
-.msg-meta{font-family:var(--mono);font-size:10px;color:var(--txtfaint);margin-top:2px}
-.msg-text{font-size:18px;line-height:1.5;font-weight:300;letter-spacing:-.2px}
-.thread{margin-top:14px;padding-top:12px;border-top:1px dashed var(--border2)}
-.thread-line{font-size:12px;color:var(--txtmid);line-height:1.5;padding:4px 0 4px 12px;border-left:2px solid var(--border2)}
+.tag { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; padding:3px 8px; border-radius:4px; }
+.tag.auto { background:var(--success-bg); color:var(--success); }
+.tag.esc { background:var(--warning-bg); color:var(--warning); }
+.tag.pending { background:#f1f5f9; color:var(--text-muted); }
 
-/* intent bars */
-.intent-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.intent-label{font-family:var(--mono);font-size:10px;width:140px;flex:none;color:var(--txtmid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.intent-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.intent-fill{height:100%;border-radius:2px;background:var(--border2);transition:width .6s cubic-bezier(.2,.8,.3,1)}
-.intent-fill.top{background:linear-gradient(90deg,var(--green2),var(--green))}
-.intent-val{font-family:var(--mono);font-size:10px;color:var(--txtfaint);width:36px;text-align:right}
+/* MAIN STAGE */
+.stage { flex:1; display:flex; flex-direction:column; background:var(--bg); overflow:y-auto; }
+.stage-header { padding:18px 24px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.t-id { font-family:var(--mono); font-size:13px; color:var(--text-muted); }
+.server-status { font-size:13px; font-weight:500; color:var(--text-muted); display:flex; align-items:center; gap:8px; }
+.dot { width:8px; height:8px; border-radius:50%; background:var(--success); }
 
-/* verdict */
-.verdict{border-radius:10px;padding:16px;margin:0;border:1px solid var(--border2)}
-.verdict.auto-v{border-color:rgba(95,240,77,.35);background:rgba(95,240,77,.04)}
-.verdict.esc-v{border-color:rgba(240,168,50,.35);background:rgba(240,168,50,.04)}
-.verdict-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.verdict-badge{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.verdict-badge.auto-b{color:var(--green)}
-.verdict-badge.esc-b{color:var(--amber)}
-.verdict-text{font-size:13px;line-height:1.6;color:var(--txt);margin-bottom:12px}
-.gate-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--txtfaint);margin-bottom:5px}
-.gate-tick{width:13px;height:13px;border-radius:3px;border:1px solid var(--border2);display:grid;place-items:center;font-size:8px;flex:none}
-.gate-tick.pass{background:rgba(95,240,77,.12);border-color:rgba(95,240,77,.5);color:var(--green)}
-.gate-tick.fail{background:rgba(240,92,82,.08);border-color:rgba(240,92,82,.4);color:var(--red)}
-.gate-name{color:var(--txtmid);font-weight:500}
-.gate-val{margin-left:auto;color:var(--txtfaint)}
+.stage-content { padding:24px; flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:20px; max-width:900px; margin:0 auto; width:100%; }
 
-/* draft */
-.draft-area{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:13.5px;line-height:1.7;min-height:100px;white-space:pre-wrap;outline:none;color:var(--txt);transition:.2s}
-.draft-area:focus{border-color:rgba(95,240,77,.5);box-shadow:0 0 0 3px rgba(95,240,77,.07)}
-.draft-area[contenteditable]{cursor:text}
+/* Cards */
+.c-card { background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+.c-header { padding:14px 20px; border-bottom:1px solid var(--border); background:#f8fafc; font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); display:flex; justify-content:space-between; }
+.c-body { padding:20px; }
 
-.action-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;border-top:1px solid var(--border2);background:var(--surface);flex-wrap:wrap}
-.btn{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border2);background:var(--card);color:var(--txtmid);padding:8px 16px;border-radius:7px;cursor:pointer;transition:.15s;white-space:nowrap}
-.btn:hover{border-color:var(--border2);color:var(--txt);background:rgba(255,255,255,.05)}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--green);border-color:var(--green);color:#060d05;font-weight:700}
-.btn.primary:hover{background:#7af765}
-.btn.danger{border-color:rgba(240,168,50,.45);color:var(--amber)}
-.btn.danger:hover{background:rgba(240,168,50,.08)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.ms-label{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--txtfaint)}
+/* Msg bubble */
+.msg-bubble { background:var(--brand-light); border:1px solid rgba(76,51,247,0.1); border-radius:12px 12px 12px 0; padding:18px; margin-bottom:16px; color:var(--text-main); font-size:15px; line-height:1.6; max-width:85%; }
+.meta-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.avatar { width:24px; height:24px; border-radius:50%; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; }
+.author { font-weight:600; }
+.via { color:var(--text-muted); font-size:13px; }
 
-/* evidence */
-.ev-item{padding:14px 16px;border-bottom:1px solid var(--border)}
-.ev-item:last-child{border-bottom:none}
-.ev-sim{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--green);background:rgba(95,240,77,.08);border:1px solid rgba(95,240,77,.25);border-radius:4px;padding:2px 7px;margin-bottom:7px}
-.ev-q{font-size:11.5px;line-height:1.5;color:var(--txtmid);margin-bottom:6px}
-.ev-a{font-size:11.5px;line-height:1.55;color:var(--txt);padding-left:10px;border-left:2px solid var(--green2);opacity:.85}
+/* Grid 2 */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 
-/* trace */
-.trace-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px}
-.trace-row:last-child{border-bottom:none}
-.trace-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex:none}
-.trace-name{color:var(--txtmid);flex:1}
-.trace-ms{color:var(--green);font-weight:500}
-.trace-note{font-size:9px;color:var(--txtfaint);padding-left:13px;margin-top:-2px;margin-bottom:4px}
+/* Intent */
+.intent-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; font-size:13px; }
+.i-lbl { width:130px; font-weight:500; color:var(--text-main); }
+.i-bar-bg { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+.i-bar-val { height:100%; background:var(--border-strong); border-radius:3px; transition:0.5s ease; }
+.i-bar-val.top { background:var(--brand); }
+.i-val { width:35px; font-family:var(--mono); color:var(--text-muted); text-align:right; }
 
-/* EVAL TAB */
-.eval-wrap{padding:24px;overflow-y:auto;height:calc(100vh - 52px)}
-.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.hero-card{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:18px}
-.hero-k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--txtfaint);margin-bottom:10px}
-.hero-v{font-size:36px;line-height:1;font-weight:300;letter-spacing:-1px}
-.hero-v.warn{color:var(--amber)}
-.hero-d{font-family:var(--mono);font-size:10px;color:var(--txtfaint);margin-top:8px}
-.hero-d b{color:var(--green)}
-.gsec{background:var(--card);border:1px solid var(--border2);border-radius:12px;margin-bottom:18px;overflow:hidden}
-.gsec-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border2);background:var(--surface)}
-.gsec-head h3{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--txtmid)}
-.gsec-head span{font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-th{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--txtfaint);text-align:right;padding:10px 14px;border-bottom:1px solid var(--border2)}
-th:first-child{text-align:left}td{padding:11px 14px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:11px;color:var(--txtmid)}
-tr:last-child td{border-bottom:none}
-td:first-child{font-family:var(--sans);font-size:13px;color:var(--txt);text-align:left}
-tr.highlight td{color:var(--txt)}tr.highlight td:first-child{color:var(--green)}
-.bar-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}
-.bar-row:last-child{border-bottom:none}
-.bar-label{font-family:var(--mono);font-size:10px;width:145px;flex:none;color:var(--txtmid)}
-.bar-track{flex:1;height:18px;background:var(--bg);border-radius:5px;position:relative;overflow:hidden;border:1px solid var(--border)}
-.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(61,176,53,.5),rgba(95,240,77,.85));transition:width .7s cubic-bezier(.2,.8,.3,1)}
-.bar-fill.low{background:linear-gradient(90deg,rgba(240,92,82,.4),rgba(240,168,50,.8))}
-.bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;color:var(--txt)}
-.bar-n{font-family:var(--mono);font-size:10px;color:var(--txtfaint);width:40px;text-align:right}
-.fail-item{padding:16px}
-.fail-item+.fail-item{border-top:1px solid var(--border)}
-.fail-num{font-size:22px;color:var(--red);font-weight:300;line-height:1;margin-bottom:6px}
-.fail-name{font-size:14px;font-weight:500;margin-bottom:4px}
-.fail-count{font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
-.fail-ex{background:var(--bg);border-left:2px solid var(--red);padding:9px 12px;font-size:12px;line-height:1.55;color:var(--txtmid);margin:8px 0;border-radius:0 6px 6px 0}
-.fail-hyp{font-size:12px;line-height:1.6;color:var(--txtmid)}
-.fail-hyp b{color:var(--txt)}
-.caveat-wrap{background: linear-gradient(180deg,rgba(240,168,50,.06),transparent);border:1px solid rgba(240,168,50,.3);border-radius:12px;padding:20px;margin-bottom:18px}
-.caveat-wrap h3{font-size:20px;font-weight:300;margin-bottom:14px;color:var(--amber)}
-.caveat-wrap ol{margin-left:18px;display:flex;flex-direction:column;gap:10px}
-.caveat-wrap li{font-size:13px;line-height:1.65;color:var(--txtmid)}
-.caveat-wrap li b{color:var(--txt)}
+/* Verdict */
+.v-box { padding:16px; border-radius:8px; border:1px solid var(--border); margin-bottom:12px; }
+.v-box.auto { background:var(--success-bg); border-color:rgba(34,197,94,0.3); }
+.v-box.esc { background:var(--warning-bg); border-color:rgba(245,158,11,0.3); }
+.v-title { font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+.v-box.auto .v-title { color:#166534; }
+.v-box.esc .v-title { color:#92400e; }
+.v-txt { font-size:14px; line-height:1.6; color:var(--text-main); }
+.gate-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-muted); }
+.gate-row:last-child { border-bottom:none; padding-bottom:0; }
+.pass { color:var(--success); font-weight:600; }
+.fail { color:var(--danger); font-weight:600; }
 
-/* LOG TAB */
-.log-wrap{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;overflow-y:auto;height:calc(100vh - 52px)}
-.log-card{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;transition:.2s cursor:default}
-.log-card:hover{border-color:var(--border2);box-shadow:0 0 0 1px var(--border2);transform:translateY(-1px)}
-.log-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.log-num{font-family:var(--mono);font-size:10px;color:var(--txtfaint)}
-.log-tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--txtfaint);margin-left:auto}
-.log-title{font-size:13.5px;font-weight:500;margin-bottom:6px;line-height:1.4}
-.log-why{font-size:12px;line-height:1.6;color:var(--txtmid)}
-.log-why b{color:var(--txt)}
+/* Reply Editor */
+.editor { min-height:140px; padding:16px; border:1px solid var(--border-strong); border-radius:8px; font-size:15px; line-height:1.7; outline:none; transition:0.2s; white-space:pre-wrap; }
+.editor:focus { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-light); }
+.actions { display:flex; gap:12px; padding:16px 20px; background:#f8fafc; border-top:1px solid var(--border); }
 
-/* loading spinner */
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.btn { padding:10px 18px; border-radius:6px; font-weight:600; font-size:13px; cursor:pointer; border:1px solid transparent; transition:0.2s; display:flex; align-items:center; gap:6px; }
+.btn-primary { background:var(--brand); color:#fff; }
+.btn-primary:hover { background:var(--brand-hover); }
+.btn-secondary { background:#fff; border-color:var(--border-strong); color:var(--text-main); }
+.btn-secondary:hover { background:var(--bg); }
+.btn-danger { background:#fff; border-color:var(--danger); color:var(--danger); }
+.btn-danger:hover { background:var(--danger-bg); }
 
-/* toast */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-family:var(--mono);font-size:11px;color:var(--txt);z-index:999;transform:translateY(80px);opacity:0;transition:.3s;pointer-events:none}
-#toast.show{transform:translateY(0);opacity:1}
-#toast.success{border-color:rgba(95,240,77,.4);color:var(--green)}
-#toast.error{border-color:rgba(240,92,82,.4);color:var(--red)}
+/* Evidence */
+.ev-card { padding:14px 0; border-bottom:1px solid var(--border); }
+.ev-card:last-child { border-bottom:none; padding-bottom:0; }
+.sim-pill { display:inline-block; font-family:var(--mono); font-size:11px; background:#e2e8f0; padding:2px 8px; border-radius:4px; margin-bottom:8px; font-weight:500; }
+.ev-q { font-size:13px; color:var(--text-muted); margin-bottom:8px; }
+.ev-a { font-size:14px; border-left:3px solid var(--brand); padding-left:12px; color:var(--text-main); line-height:1.6; }
 
-.hidden{display:none!important}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+/* Settings / Empty State */
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-muted); }
+.empty-state svg { width:48px; height:48px; color:var(--border-strong); margin-bottom:16px; }
+.empty-state h3 { font-size:18px; font-weight:600; color:var(--text-main); margin-bottom:8px; }
+
 </style>
 </head>
 <body>
-<div class="app">
-<header class="topbar">
-  <div class="logo">
-    <div class="logo-icon">H</div>
-    <div class="logo-text">Hiver <span>AI</span></div>
-  </div>
-  <div class="badge">@AppleSupport</div>
-  <div class="spacer"></div>
-  <div class="tabs">
-    <button class="active" onclick="switchTab('console',this)">Console</button>
-    <button onclick="switchTab('eval',this)">Evaluation</button>
-    <button onclick="switchTab('log',this)">Decision Log</button>
-  </div>
-  <div class="status">
-    <span class="dot" id="connDot"></span>
-    <span id="connTxt">connecting...</span>
-  </div>
-</header>
+<div class="app-container">
 
-<!-- CONSOLE TAB -->
-<div id="tab-console" style="display:contents">
-<div class="main">
-  <!-- Queue -->
-  <div class="col">
-    <div class="col-head"><h3>Inbound Queue</h3><span id="qCount">0 open</span></div>
-    <div id="queue"></div>
-  </div>
-
-  <!-- Stage -->
-  <div class="col" id="stageCol">
-    <div class="stage-empty" id="stageEmpty">Select a message to begin triage</div>
-    <div class="stage hidden" id="stage">
-      <!-- msg -->
-      <div class="card">
-        <div class="card-head"><h4>Customer Message</h4><span id="stageId" class=""></span></div>
-        <div class="card-body">
-          <div class="msg-from">
-            <div class="avatar" id="stageAvatar">??</div>
-            <div><div style="font-weight:600;font-size:13px" id="stageHandle"></div><div class="msg-meta" id="stageMeta"></div></div>
-          </div>
-          <div class="msg-text" id="stageText"></div>
-          <div class="thread hidden" id="stageThread"></div>
-        </div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-
-      <!-- intent + verdict row -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border2)">
-        <div class="card" style="border-right:1px solid var(--border2);border-bottom:none">
-          <div class="card-head"><h4>Intent Analysis</h4><span id="intentConf">—</span></div>
-          <div class="card-body" id="intentBody">
-            <div class="stage-empty" style="height:80px;font-size:10px">triaging...</div>
-          </div>
-        </div>
-        <div class="card" style="border-bottom:none">
-          <div class="card-head"><h4>Routing Decision</h4><span id="gateLabel">—</span></div>
-          <div class="card-body" id="verdictBody">
-            <div class="stage-empty" style="height:80px;font-size:10px">awaiting model</div>
-          </div>
-        </div>
+      <div class="logo-text">Hiver AI</div>
+    </div>
+    <div class="nav-menu">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Triage Inbox
       </div>
-
-      <!-- draft -->
-      <div class="card" style="flex:1">
-        <div class="card-head"><h4 id="draftTitle">AI Draft Reply</h4><span id="draftMeta">—</span></div>
-        <div class="card-body">
-          <div class="draft-area" id="draftBox" contenteditable="true" spellcheck="true">Generating...</div>
-        </div>
-        <div class="action-bar" id="actionBar">
-          <button class="btn primary" id="btnSend" onclick="sendReply()">Send Reply</button>
-          <button class="btn" id="btnRegen" onclick="regenReply()">↻ Regenerate</button>
-          <button class="btn danger" id="btnEsc" onclick="escalate()">Escalate ↗</button>
-          <span class="ms-label" id="msLabel">—</span>
-        </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Decision Log
       </div>
     </div>
   </div>
 
-  <!-- Evidence -->
-  <div class="col">
-    <div class="col-head"><h3>Grounding Evidence</h3><span id="evCount">top-k</span></div>
-    <div id="evidence"><div style="padding:20px;color:var(--txtfaint);font-family:var(--mono);font-size:11px">Select a message</div></div>
-    <div class="col-head" style="margin-top:0"><h3>Run Trace</h3><span></span></div>
-    <div id="trace" style="padding:12px 16px"><div style="color:var(--txtfaint);font-family:var(--mono);font-size:11px">—</div></div>
+  <!-- INBOX LIST -->
+  <div class="inbox-panel">
+    <div class="panel-header">
+      <div class="panel-title">Active Tickets</div>
+      <div class="badge" id="qCount">6</div>
+    </div>
+    <div class="ticket-list" id="queueList"></div>
   </div>
-</div>
-</div>
 
-<!-- EVAL TAB -->
-<div id="tab-eval" class="hidden">
-<div class="eval-wrap">
-  <div class="hero-grid" id="heroMetrics"></div>
-  <div class="g2">
-    <div class="gsec">
-      <div class="gsec-head"><h3>Results vs. baselines</h3><span>golden set · n=214</span></div>
-      <table id="baselineTable"></table>
+  <!-- MAIN STAGE -->
+  <div class="stage">
+    <div class="stage-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="t-id" id="hdrId">#TICKET_ID</span>
+        <span class="tag pending" style="margin:0" id="hdrBrand">@AppleSupport</span>
+      </div>
+      <div class="server-status">
+        <div class="dot"></div> Server Connected
+      </div>
     </div>
-    <div class="gsec">
-      <div class="gsec-head"><h3>Per-intent F1</h3><span>agent</span></div>
-      <div id="perIntent"></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="gsec">
-      <div class="gsec-head"><h3>Judge ↔ human agreement</h3><span>60 double-scored</span></div>
-      <table id="judgeTable"></table>
-      <div style="padding:8px 14px 12px;font-family:var(--mono);font-size:10px;color:var(--txtfaint)" id="judgeNote"></div>
-    </div>
-    <div class="gsec">
-      <div class="gsec-head"><h3>Escalation confusion</h3><span>auto vs. human</span></div>
-      <table id="escTable"></table>
-      <div style="padding:8px 14px 12px;font-family:var(--mono);font-size:10px;color:var(--txtfaint)" id="escNote"></div>
+    
+    <div class="stage-content" id="stageContent">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <h3>No Selection</h3>
+        <p>Select a ticket from the queue to run the AI triage.</p>
+      </div>
     </div>
   </div>
-  <div class="gsec">
-    <div class="gsec-head"><h3>Top 5 failure modes</h3><span>214 golden + 300 spot-checked</span></div>
-    <div id="failures"></div>
-  </div>
-  <div class="caveat-wrap"><h3>⚠ What is misleading about my headline number?</h3><ol id="caveats"></ol></div>
-</div>
-</div>
 
-<!-- LOG TAB -->
-<div id="tab-log" class="hidden">
-  <div class="log-wrap" id="decisionLog"></div>
 </div>
-
-</div><!-- .app -->
-
-<div id="toast"></div>
 
 <script>
 const API = "http://localhost:8000";
 
-/* ── DATA ── */
-const QUEUE_SEED=[
-  {id:"t_1184",handle:"@marlow_j",ts:"2m",text:"since ios update my phone dies at 40% and gets hot as hell. 11 pro, less than a year old. this is the third update thats broken something",thread:[]},
-  {id:"t_1185",handle:"@dana.k",ts:"6m",text:"this is the FOURTH time im messaging you. nobody has fixed anything. i want a replacement or my money back, im done being polite about it",thread:["@dana.k 2d ago: macbook screen flickering after repair","@AppleSupport 2d ago: we'd like to look into this, DM us","@dana.k 1d ago: sent the DM, no reply"]},
-  {id:"t_1186",handle:"@r_whitcombe",ts:"11m",text:"airpods keep disconnecting from my mac but work fine on the phone. tried forgetting the device twice",thread:[]},
-  {id:"t_1187",handle:"@sofia__tt",ts:"18m",text:"charged twice for icloud storage this month. can you check my account?",thread:[]},
-  {id:"t_1188",handle:"@kev_ngata",ts:"24m",text:"update stuck on the apple logo for 2 hours now. cant turn it off, cant do anything. tried holding buttons",thread:[]},
-  {id:"t_1189",handle:"@tomasz.w",ts:"31m",text:"how do i move my photos to a new phone without losing the albums? about 40gb worth",thread:[]}
+let queue = [
+  {id:"t_1184", handle:"@marlow_j", ts:"2m", text:"since ios update my phone dies at 40% and gets hot as hell. 11 pro, less than a year old. this is the third update thats broken something."},
+  {id:"t_1185", handle:"@dana.k", ts:"6m", text:"this is the FOURTH time im messaging you. nobody has fixed anything. i want a replacement or my money back, im done being polite about it"},
+  {id:"t_1186", handle:"@r_whitcombe", ts:"11m", text:"airpods keep disconnecting from my mac but work fine on the phone. tried forgetting the device twice"},
+  {id:"t_1187", handle:"@sofia__tt", ts:"18m", text:"charged twice for icloud storage this month. can you check my account?"},
+  {id:"t_1188", handle:"@kev_ngata", ts:"24m", text:"update stuck on the apple logo for 2 hours now. cant turn it off, cant do anything. tried holding buttons"}
 ];
+queue = queue.map(q => ({...q, state:null, isWorking:false}));
 
-const EVAL={
-  hero:[{k:"Intent Macro-F1",v:"0.79",d:"vs <b>0.31</b> majority · <b>0.64</b> TF-IDF+LR"},{k:"Escalation Recall",v:"0.94",d:"must-escalate caught · <b>28%</b> over-escalation"},{k:"Judge Reply Score",v:"3.9",suf:"/5",d:"human avg <b>3.6</b> on same 60 replies"},{k:"Safe Auto-Handle",v:"41",suf:"%",d:"at <b>0</b> unsafe sends to customers",warn:true}],
-  baselines:[{n:"Majority class",t:"trivial",f1:"0.31",esc:"0.00",re:"—",au:"0%"},{n:"Keyword rules",t:"trivial",f1:"0.42",esc:"0.51",re:"2.1",au:"77%"},{n:"TF-IDF + LogReg",t:"simple",f1:"0.64",esc:"0.69",re:"—",au:"—"},{n:"LLM zero-shot",t:"simple",f1:"0.71",esc:"0.77",re:"3.1",au:"68%"},{n:"This agent (RAG + gate)",t:"ours",f1:"0.79",esc:"0.94",re:"3.9",au:"41%",best:true}],
-  perIntent:[{l:"account_billing",f:.93,n:31},{l:"data_backup",f:.88,n:26},{l:"battery_drain",f:.86,n:34},{l:"connectivity",f:.84,n:29},{l:"update_issue",f:.74,n:38},{l:"device_boot",f:.71,n:22},{l:"rage_no_action",f:.66,n:19},{l:"other",f:.51,n:15}],
-  judge:[{m:"Exact agreement",v:"52%"},{m:"Within ±1 pt",v:"88%"},{m:"Spearman ρ",v:"0.71"},{m:"Weighted κ",v:"0.62"},{m:"Judge bias",v:"+0.3"}],
-  judgeNote:"Judge rewards fluency over groundedness — used only for ranking systems, not absolute quality.",
-  esc:[{m:"Human: esc → agent esc",v:"48/51"},{m:"Human: esc → agent auto (miss)",v:"3"},{m:"Human: auto → agent esc",v:"46"},{m:"Human: auto → both auto",v:"117"}],
-  escNote:"3 misses were sarcasm read as literal. Over-escalation is a cost issue; a miss is a trust issue.",
-  failures:[
-    {n:1,name:"Sarcasm as literal request",c:"11/214",ex:'"great, another update to brick my phone 🙃"',h:"Classified as <b>update_issue at 0.81</b> and auto-answered. Emoji stripped in normalization removes the strongest signal."},
-    {n:2,name:"Multi-intent collapses to one",c:"19/214",ex:'"battery dying AND charged twice this month"',h:"Billing half silently dropped. <b>Framing error</b>: needs multi-label output."},
-    {n:3,name:"Right topic, wrong era",c:"14/214",ex:"Retrieved 2017 thread citing a Control Centre path no longer in iOS.",h:"No time decay on similarity. Reply is <b>grounded and wrong</b> — worst failure shape."},
-    {n:4,name:"Empathy inflation",c:"9/214",ex:"Cable question → 3 lines of apology before any answer.",h:"Precedents skew angry-customer. Tone must be conditioned on severity."},
-    {n:5,name:"Confident label on nonsense",c:"7/214",ex:'"@AppleSupport 🍎🍎🍎 when"',h:"<b>Softmax always sums to 1.</b> Needs abstain option or length gate before classification."}
-  ],
-  caveats:[
-    "<b>Macro-F1 0.79 is on my own labels.</b> I built the 6-class taxonomy after reading the data — fitted to what is separable. Different annotators = different number.",
-    "<b>Golden set is stratified; real queue is not.</b> Three classes are ~70% of volume. Production-weighted F1 is 0.84 — flattering.",
-    "<b>3.9/5 judge score from a judge that agrees with me 52% of the time.</b> Fine for ranking systems, not for absolute quality claims.",
-    "<b>41% auto-handle is a policy choice.</b> Lower the bar to 0.6 → 60%+ auto-handle, missed escalations jump from 3 to 11.",
-    "<b>Dataset is 2017 Twitter.</b> Brand replies are short, public-audience-optimised. Nothing transfers cleanly to email or chat."
-  ]
-};
+let activeId = null;
 
-const DECISIONS=[
-  {tag:"scope",t:"Picked @AppleSupport over @AmazonHelp",w:"Apple threads are <b>device-centric and self-contained</b>. Amazon depends on order state the dataset never exposes."},
-  {tag:"scope",t:"Built 6 intents, not 30+",w:"Intents were merged until every class had <b>≥15 golden examples and a distinct reply playbook</b>."},
-  {tag:"data",t:"Reconstructed 106K conversations from raw CSV",w:"Paired tweets by in_response_to_tweet_id to get customer → brand reply pairs. Deduplicated near-identical messages first."},
-  {tag:"model",t:"TF-IDF + LogReg for intent (not BERT)",w:"6 well-separated classes. TF-IDF runs in <b>< 5ms</b>; a BERT encoder adds 50-100ms with less than 1pt F1 gain on this domain."},
-  {tag:"model",t:"Retrieval restricted to resolved threads",w:"Grounding in unresolved threads teaches the agent to imitate replies that already failed."},
-  {tag:"model",t:"Cosine sim on TF-IDF vectors, not dense embeddings",w:"For 100k strings, dense encoders add latency with minimal gain. Easily swappable to bge-small later."},
-  {tag:"policy",t:"Escalation is a deterministic rule gate",w:"An LLM asked 'should you escalate?' talks itself into competence. Five hard rules are <b>auditable by any support lead</b>."},
-  {tag:"policy",t:"Confidence never overrides a policy rule",w:"The iCloud billing ticket scores 0.94 and still escalates. <i>What</i> the customer wants ≠ <i>permission</i> to act."},
-  {tag:"policy",t:"Miss : over-escalation cost ratio = 15:1",w:"Writing the ratio explicitly made threshold tuning mechanical, not a matter of taste."},
-  {tag:"eval",t:"Judge scores used as ranking signals only",w:"52% exact agreement → use judge to say A > B, never to say A is good. Absolute claims are human-anchored."},
-  {tag:"eval",t:"Kept four baselines",w:"The critical gap is zero-shot LLM → RAG (0.71 → 0.79). Without that baseline I'd credit the LLM for what retrieval was doing."},
-  {tag:"cut",t:"Did not build: multi-turn, tone matching, live send",w:"Each is a project. Naming them as <b>deliberate cuts</b> is more honest than shipping thin versions."}
-];
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  document.getElementById('qCount').textContent = queue.length;
+  
+  list.innerHTML = queue.map(q => {
+    const isWorking = q.isWorking;
+    const isEsc = q.state?.escalated;
+    const intent = q.state?.intent || "pending";
+    
+    let tagsHTML = `<span class="tag pending">Pending</span>`;
+    if (isWorking) {
+      tagsHTML = `<span class="tag pending" style="background:#e0f2fe;color:#0284c7">Triaging...</span>`;
+    } else if (q.state) {
+      tagsHTML = `
+        <span class="tag ${isEsc ? 'esc' : 'auto'}">${isEsc ? 'Escalate' : 'Auto-handle'}</span>
+        <span class="tag pending" style="background:#f1f5f9">${intent.replace(/_/g," ")}</span>
+      `;
+    }
 
-/* ── STATE ── */
-let queue=QUEUE_SEED.map(q=>({...q,triage:null,status:"pending"}));
-let current=null;
-let isLoading=false;
-let totalMs=0;
-
-/* ── UTILS ── */
-const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-function toast(msg,type="success"){const t=$("#toast");t.textContent=msg;t.className="show "+type;setTimeout(()=>{t.className=""},2500)}
-
-/* ── TAB SWITCH ── */
-function switchTab(tab,btn){
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  $("#tab-console").classList.toggle("hidden",tab!=="console");
-  document.getElementById("tab-console").style.display=tab==="console"?"contents":"none";
-  $("#tab-eval").classList.toggle("hidden",tab!=="eval");
-  $("#tab-log").classList.toggle("hidden",tab!=="log");
+    return `
+      <div class="ticket ${q.id === activeId ? 'selected' : ''}" onclick="selectItem('${q.id}')">
+        <div class="t-head">
+          <span class="t-handle">${q.handle}</span>
+          <span class="t-time">${q.ts}</span>
+        </div>
+        <div class="t-snippet">${q.text}</div>
+        <div class="t-tags">${tagsHTML}</div>
+      </div>
+    `;
+  }).join('');
 }
 
-/* ── RENDER QUEUE ── */
-function renderQueue(){
-  $("#qCount").textContent=queue.length+" open";
-  $("#queue").innerHTML=queue.map(m=>{
-    const t=m.triage;
-    const cls=t?.escalated?"esc":"auto";
-    const label=t?.escalated?"escalate":"auto-handle";
-    const stCls=m.status==="working"?"working":(!t?"":(t.escalated?"esc":"auto"));
-    const stLabel=m.status==="working"?"triaging...":(t?(t.escalated?"escalate":"auto-handle"):"pending");
-    return `<button class="qitem${current?.id===m.id?" active":""}" onclick="select('${m.id}')">
-      <div class="q-head">
-        <span class="q-handle">${esc(m.handle)}</span>
-        <span class="q-time">${esc(m.ts)}</span>
-      </div>
-      <div class="q-text">${esc(m.text)}</div>
-      <div class="q-tags">
-        <span class="tag ${stCls}">${stLabel}</span>
-        ${t?`<span class="tag">${esc((t.intent||"?").replace(/_/g," "))}</span><span class="tag">${t.confidence?.toFixed(2)||"?"}</span>`:""}
-      </div>
-    </button>`;
-  }).join("");
+async function selectItem(id) {
+  activeId = id;
+  renderQueue();
+  
+  const item = queue.find(q => q.id === id);
+  if (!item.state && !item.isWorking) {
+    await triageItem(item);
+  } else {
+    renderStage();
+  }
 }
 
-/* ── RENDER STAGE ── */
-function renderStage(){
-  const m=current; if(!m){return;}
-  $("#stageEmpty").classList.add("hidden");
-  $("#stage").classList.remove("hidden");
-  const t=m.triage;
-  const handle=m.handle;
-  const initials=handle.replace(/[@_.]/g,"").slice(0,2).toUpperCase();
+async function triageItem(item) {
+  item.isWorking = true;
+  renderQueue();
+  renderStage(); // shows loading state
+  
+  try {
+    const res = await fetch(API + "/triage", {
+      method:"POST", 
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:item.id, text:item.text})
+    });
+    const data = await res.json();
+    item.state = data;
+  } catch (e) {
+    console.error(e);
+    item.state = { intent:"Error", confidence:0, intent_scores:{}, escalated:true, reply:"Connection failed.", evidence:[], retrieved_evidence:0 };
+  }
+  
+  item.isWorking = false;
+  
+  // if user still looking at this item
+  if (activeId === item.id) {
+    renderQueue();
+    renderStage();
+  }
+}
 
-  $("#stageId").textContent=m.id;
-  $("#stageAvatar").textContent=initials;
-  $("#stageHandle").textContent=handle;
-  $("#stageMeta").textContent=`${m.id} · ${m.ts} ago · public mention → @AppleSupport`;
-  $("#stageText").textContent=m.text;
+function renderStage() {
+  const container = document.getElementById('stageContent');
+  const item = queue.find(q => q.id === activeId);
+  if (!item) return;
 
-  const threadEl=$("#stageThread");
-  if(m.thread?.length){
-    threadEl.classList.remove("hidden");
-    threadEl.innerHTML="<div style='font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--txtfaint);margin-bottom:6px'>Prior thread</div>"+
-      m.thread.map(l=>`<div class="thread-line">${esc(l)}</div>`).join("");
-  } else {threadEl.classList.add("hidden");}
+  document.getElementById('hdrId').textContent = "Ticket #" + item.id;
+  
+  const initial = item.handle.replace(/[@_.]/g,"").substring(0,1).toUpperCase();
+  
+  // The customer message block
+  let html = `
+    <div style="display:flex; flex-direction:column;">
+      <div class="meta-row">
+        <div class="avatar">${initial}</div>
+        <span class="author">${item.handle}</span>
+        <span class="via">via Twitter</span>
+      </div>
+      <div class="msg-bubble">${item.text}</div>
+    </div>
+  `;
 
-  if(!t || m.status==="working"){
-    $("#intentConf").innerHTML=m.status==="working"?'<span class="spinner"></span>':"—";
-    $("#gateLabel").textContent="—";
-    $("#intentBody").innerHTML=`<div class="stage-empty" style="height:80px;font-size:10px">${m.status==="working"?"triaging with Gemini...":"awaiting triage"}</div>`;
-    $("#verdictBody").innerHTML=`<div class="stage-empty" style="height:80px;font-size:10px">—</div>`;
-    $("#draftTitle").textContent="AI Draft Reply";
-    $("#draftMeta").textContent="—";
-    $("#draftBox").textContent=m.status==="working"?"Generating grounded reply with Gemini...":"Select to triage";
-    $("#draftBox").setAttribute("contenteditable","false");
-    $("#btnSend").disabled=true;
-    $("#btnRegen").disabled=m.status==="working";
-    $("#msLabel").textContent="—";
+  if (item.isWorking) {
+    html += `
+      <div class="c-card" style="margin-top:20px;text-align:center;padding:40px;">
+        <h3 style="color:var(--text-muted)">Generating AI Response...</h3>
+        <p style="color:var(--text-faint);margin-top:8px">Running intention classification and Gemini generation.</p>
+      </div>`;
+    container.innerHTML = html;
     return;
   }
+  
+  if (!item.state) return; // Should not happen
+  const s = item.state;
+  const isAuto = !s.escalated;
 
-  const isAuto=!t.escalated;
-  $("#intentConf").textContent="conf "+t.confidence?.toFixed(2);
-  $("#gateLabel").innerHTML=isAuto?'<span style="color:var(--green);font-weight:600">◆ AUTO-HANDLE</span>':'<span style="color:var(--amber);font-weight:600">▲ ESCALATE</span>';
-
-  // Intent bars
-  const scores=Object.entries(t.intent_scores||{}).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  const top=scores[0]?.[1]||1;
-  const margin=scores.length>1?(scores[0][1]-scores[1][1]).toFixed(2):"—";
-  $("#intentBody").innerHTML=scores.map(([k,v],i)=>`
+  // Intent row generation
+  const scores = Object.entries(s.intent_scores || {}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxScore = scores[0]?.[1] || 1;
+  const intentHtml = scores.map(([k,v], i) => `
     <div class="intent-row">
-      <span class="intent-label">${esc(k.replace(/_/g," "))}</span>
-      <span class="intent-track"><span class="intent-fill ${i===0?"top":""}" style="width:${(v/top*100).toFixed(0)}%"></span></span>
-      <span class="intent-val">${v.toFixed(2)}</span>
-    </div>`).join("")+
-    `<div style="font-family:var(--mono);font-size:9px;color:var(--txtfaint);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">margin ${margin} · bar 0.75 · ${parseFloat(margin)<0.3?"⚠ LOW MARGIN":"✓ clear"}</div>`;
+      <div class="i-lbl">${k.replace(/_/g," ")}</div>
+      <div class="i-bar-bg"><div class="i-bar-val ${i===0?'top':''}" style="width:${(v/maxScore*100)}%"></div></div>
+      <div class="i-val">${v.toFixed(2)}</div>
+    </div>
+  `).join('');
 
-  // Gates
-  const gates=t.rules||[
-    {name:"intent_confidence ≥ 0.75",fired:(t.confidence||0)>=0.75,detail:(t.confidence||0).toFixed(2)},
-    {name:"retrieval_support ≥ 3",fired:(t.retrieved_evidence||0)>=3,detail:`${t.retrieved_evidence||0} threads`},
-    {name:"no escalation trigger",fired:isAuto,detail:isAuto?"clean":"triggered"},
+  // Rules HTML
+  const rules = [
+    { n: "Intent Confidence \u2265 0.75", p: s.confidence >= 0.75 },
+    { n: "Historical Matches \u2265 3", p: s.retrieved_evidence >= 3 },
+    { n: "No Escalation Triggers", p: isAuto }
   ];
-  $("#verdictBody").innerHTML=`
-    <div class="verdict ${isAuto?"auto-v":"esc-v"}">
-      <div class="verdict-top">
-        <span class="verdict-badge ${isAuto?"auto-b":"esc-b"}">${isAuto?"◆ Auto-Handle":"▲ Escalate"}</span>
+  const rulesHtml = rules.map(r => `
+    <div class="gate-row">
+      <span>${r.n}</span>
+      <span class="${r.p ? 'pass' : 'fail'}">${r.p ? 'Pass' : 'Fail'}</span>
+    </div>
+  `).join('');
+
+  const evidenceHtml = (s.evidence||[]).map(e => `
+    <div class="ev-card">
+      <div class="sim-pill">Sim: ${(e.score||e.similarity||0).toFixed(2)}</div>
+      <div class="ev-q">"${e.customer_tweet || e.customer || '(tweet text unavailable)'}"</div>
+      <div class="ev-a">${e.brand_reply}</div>
+    </div>
+  `).join('');
+
+  html += `
+    <div class="grid-2">
+      <div class="c-card">
+        <div class="c-header">Intent Analysis</div>
+        <div class="c-body">${intentHtml}</div>
       </div>
-      <div class="verdict-text">${esc(t.reply||"")}</div>
-      ${gates.map(g=>`
-        <div class="gate-row">
-          <span class="gate-tick ${g.fired?"pass":"fail"}">${g.fired?"✓":"✕"}</span>
-          <span class="gate-name">${esc(g.name)}</span>
-          <span class="gate-val">${esc(g.detail||"")}</span>
-        </div>`).join("")}
-    </div>`;
-
-  // Draft
-  $("#draftTitle").textContent=isAuto?"AI Draft Reply — Editable":"Suppressed Draft";
-  $("#draftMeta").textContent=`grounded in ${(t.evidence||[]).length} threads`;
-  $("#draftBox").textContent=t.reply||"";
-  $("#draftBox").setAttribute("contenteditable",isAuto?"true":"false");
-  $("#btnSend").disabled=!isAuto;
-  $("#btnRegen").disabled=false;
-  $("#msLabel").textContent=`${m.id} · ${totalMs}ms end-to-end`;
-}
-
-/* ── RENDER EVIDENCE ── */
-function renderEvidence(){
-  const t=current?.triage;
-  if(!t){$("#evidence").innerHTML=`<div style="padding:20px;color:var(--txtfaint);font-family:var(--mono);font-size:11px">no triage yet</div>`;return;}
-  const ev=t.evidence||[];
-  $("#evCount").textContent=`${ev.length} retrieved`;
-  $("#evidence").innerHTML=ev.length?ev.map(e=>`
-    <div class="ev-item">
-      <div class="ev-sim">sim ${(e.score||e.similarity||0).toFixed(2)}</div>
-      <div class="ev-q">${esc(e.customer_tweet||e.customer||"(tweet text unavailable)")}</div>
-      <div class="ev-a">${esc(e.brand_reply||"")}</div>
-    </div>`).join(""):`<div style="padding:20px;color:var(--txtfaint);font-family:var(--mono);font-size:11px">no evidence above threshold</div>`;
-
-  const trace=t.trace||[];
-  $("#trace").innerHTML=trace.length?trace.map(s=>`
-    <div class="trace-row"><span class="trace-dot"></span><span class="trace-name">${esc(s.step)}</span><span class="trace-ms">${s.ms||0}ms</span></div>
-    <div class="trace-note">${esc(s.note||"")}</div>`).join(""):`<div style="color:var(--txtfaint);font-family:var(--mono);font-size:11px">—</div>`;
-}
-
-/* ── SELECT MESSAGE ── */
-function select(id){
-  current=queue.find(q=>q.id===id);
-  renderQueue();renderStage();renderEvidence();
-  if(!current.triage&&current.status!=="working") runTriage();
-}
-
-/* ── TRIAGE ── */
-async function runTriage(){
-  if(!current||isLoading)return;
-  isLoading=true;
-  const m=current;
-  m.status="working";
-  renderQueue();renderStage();
-  const t0=performance.now();
-  try{
-    const res=await fetch(API+"/triage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:m.id,text:m.text})});
-    if(!res.ok)throw new Error("HTTP "+res.status);
-    const data=await res.json();
-    totalMs=Math.round(performance.now()-t0);
-    data.trace=[
-      {step:"intent classify",ms:380,note:data.intent+" ("+data.confidence?.toFixed(2)+")"},
-      {step:"retrieve (TF-IDF)",ms:58,note:`k=${data.retrieved_evidence||0} threads`},
-      {step:"generate (Gemini)",ms:totalMs-450,note:`${data.reply?.split(" ").length||0} words`},
-      {step:"policy gate",ms:2,note:data.escalated?"escalated":"5/5 passed"}
-    ];
-    m.triage=data;m.status="done";
-    $("#connDot").classList.add("live");
-    $("#connTxt").textContent="live · localhost:8000";
-  }catch(e){
-    console.error(e);
-    m.triage={intent:"Error",confidence:0,intent_scores:{},escalated:true,reply:"Backend not reachable. Make sure uvicorn is running.",evidence:[],retrieved_evidence:0,rules:[],trace:[]};
-    m.status="done";
-    $("#connTxt").textContent="offline — check backend";
-    toast("Backend error: "+e.message,"error");
-  }
-  isLoading=false;
-  if(current?.id===m.id){renderQueue();renderStage();renderEvidence();}
-}
-
-/* ── ACTIONS ── */
-function sendReply(){
-  const txt=$("#draftBox").textContent.trim();
-  if(!txt||txt.length<5){toast("Draft is empty","error");return;}
-  toast("✓ Reply sent to "+current.handle);
-  // Mark ticket resolved
-  queue=queue.filter(q=>q.id!==current.id);
-  current=queue[0]||null;
-  renderQueue();
-  if(current){renderStage();renderEvidence();}
-  else{$("#stage").classList.add("hidden");$("#stageEmpty").classList.remove("hidden");$("#evidence").innerHTML="";$("#trace").innerHTML="";}
-}
-
-async function regenReply(){
-  if(!current||isLoading)return;
-  current.triage=null;current.status="pending";
-  renderStage();renderEvidence();
-  await runTriage();
-}
-
-function escalate(){
-  toast("↗ Escalated to human agent","error");
-  if(current) {current.triage={...current.triage,escalated:true};renderStage();}
-}
-
-/* ── RENDER EVAL ── */
-function renderEval(){
-  $("#heroMetrics").innerHTML=EVAL.hero.map(h=>`
-    <div class="hero-card">
-      <div class="hero-k">${h.k}</div>
-      <div class="hero-v ${h.warn?"warn":""}">${h.v}${h.suf?`<span style="font-size:16px;color:var(--txtfaint)">${h.suf}</span>`:""}</div>
-      <div class="hero-d">${h.d}</div>
-    </div>`).join("");
-
-  $("#baselineTable").innerHTML=`
-    <thead><tr><th>System</th><th>F1</th><th>Esc.</th><th>Reply</th><th>Auto</th></tr></thead>
-    <tbody>${EVAL.baselines.map(b=>`<tr class="${b.best?"highlight":""}"><td>${b.n}<div style="font-family:var(--mono);font-size:9px;color:var(--txtfaint)">${b.t}</div></td><td>${b.f1}</td><td>${b.esc}</td><td>${b.re}</td><td>${b.au}</td></tr>`).join("")}</tbody>`;
-
-  $("#perIntent").innerHTML=EVAL.perIntent.map((p,i)=>`
-    <div class="bar-row">
-      <span class="bar-label">${p.l}</span>
-      <span class="bar-track"><span class="bar-fill ${p.f<0.72?"low":""}" style="width:${p.f*100}%"></span><span class="bar-val">${p.f.toFixed(2)}</span></span>
-      <span class="bar-n">n=${p.n}</span>
-    </div>`).join("");
-
-  $("#judgeTable").innerHTML=`<tbody>${EVAL.judge.map(j=>`<tr><td>${j.m}</td><td>${j.v}</td></tr>`).join("")}</tbody>`;
-  $("#judgeNote").textContent=EVAL.judgeNote;
-  $("#escTable").innerHTML=`<tbody>${EVAL.esc.map(j=>`<tr><td>${j.m}</td><td>${j.v}</td></tr>`).join("")}</tbody>`;
-  $("#escNote").textContent=EVAL.escNote;
-  $("#failures").innerHTML=EVAL.failures.map(f=>`
-    <div class="fail-item">
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px">
-        <span class="fail-num">0${f.n}</span>
-        <span class="fail-name">${f.name}</span>
-        <span class="fail-count" style="margin-left:auto">${f.c}</span>
+      
+      <div class="c-card">
+        <div class="c-header">Routing Engine</div>
+        <div class="c-body" style="padding-top:16px;">
+          <div class="v-box ${isAuto ? 'auto' : 'esc'}">
+            <div class="v-title">${isAuto ? '✓ Safe to Auto-Handle' : '⚠ Requires Human Input'}</div>
+            <div class="v-txt">${s.reply || 'Generated draft below.'}</div>
+          </div>
+          ${rulesHtml}
+        </div>
       </div>
-      <div class="fail-ex">${f.ex}</div>
-      <div class="fail-hyp">${f.h}</div>
-    </div>`).join("");
-  $("#caveats").innerHTML=EVAL.caveats.map(c=>`<li>${c}</li>`).join("");
+    </div>
+
+    <div class="c-card">
+      <div class="c-header"><span>Grounded Draft Reply</span> <span style="text-transform:none;font-family:var(--mono);">Based on ${s.retrieved_evidence||0} historical threads</span></div>
+      <div class="c-body" style="padding:16px;background:#f8fafc;">
+        <div class="editor" contenteditable="${isAuto}">${s.reply}</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" ${!isAuto ? 'disabled style="opacity:0.5"' : ''} onclick="alert('Sent!')">Send Reply</button>
+        <button class="btn btn-secondary" onclick="triageItem(queue.find(q=>q.id==='${item.id}'))">Regenerate</button>
+        <button class="btn btn-danger" style="margin-left:auto" onclick="alert('Escalated to Human Agent')">Route to Agent</button>
+      </div>
+    </div>
+    
+    <div class="c-card mb-4" style="margin-bottom:40px;">
+      <div class="c-header">Historical Evidence</div>
+      <div class="c-body">
+        ${evidenceHtml || '<p style="color:var(--text-muted)">No evidence retrieved.</p>'}
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
 }
 
-function renderLog(){
-  $("#decisionLog").innerHTML=DECISIONS.map((d,i)=>`
-    <div class="log-card">
-      <div class="log-top"><span class="log-num">${String(i+1).padStart(2,"0")}</span><span class="log-tag">${d.tag}</span></div>
-      <div class="log-title">${d.t}</div>
-      <div class="log-why">${d.w}</div>
-    </div>`).join("");
-}
-
-/* ── KEYBOARD ── */
-document.addEventListener("keydown",e=>{
-  if(e.target.isContentEditable)return;
-  const i=queue.findIndex(q=>q.id===current?.id);
-  if(e.key==="j"&&i<queue.length-1)select(queue[i+1].id);
-  if(e.key==="k"&&i>0)select(queue[i-1].id);
-  if(e.key==="Enter"&&current&&!$("#btnSend").disabled)sendReply();
-});
-
-/* ── BOOT ── */
-renderQueue();renderEval();renderLog();
-// Auto-select first + triage it
-select(queue[0].id);
+// Init
+renderQueue();
 </script>
 </body>
 </html>
