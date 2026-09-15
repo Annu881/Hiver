@@ -1421,20 +1421,25 @@
     const SIMULATED_HANDLES = ["@josh_d", "@samantha_99", "@tech_guy22", "@anna_banana", "@crypto_bro", "@lisalisa"];
 
     function simulateNewTicket() {
-      const t = {
-        id: `t_${tCounter++}`,
-        handle: SIMULATED_HANDLES[Math.floor(Math.random() * SIMULATED_HANDLES.length)],
-        ts: 'Just now',
-        text: SIMULATED_TWEETS[Math.floor(Math.random() * SIMULATED_TWEETS.length)],
-        state: null,
-        working: false
-      };
-      queue.unshift(t);
-      renderQueue(document.getElementById('searchInput').value);
-      toast(`New ticket from ${t.handle}`, 'info');
-    }
+  let customText = prompt("Type a custom tweet for the support agent:", "");
+  if (customText === null || customText.trim() === "") {
+    customText = SIMULATED_TWEETS[Math.floor(Math.random() * SIMULATED_TWEETS.length)];
+  }
+  const t = {
+    id: `t_${tCounter++}`,
+    handle: SIMULATED_HANDLES[Math.floor(Math.random() * SIMULATED_HANDLES.length)],
+    ts: 'Just now',
+    text: customText,
+    state: null,
+    working: false
+  };
+  queue.unshift(t);
+  const searchInput = document.getElementById('searchInput');
+  renderQueue(searchInput ? searchInput.value : '');
+  toast(`New ticket from ${t.handle}`, 'info');
+}
 
-    /* ── TOAST ── */
+/* ── TOAST ── */
     function toast(msg, type = 'success') {
       const el = document.getElementById('toast');
       const icon = document.getElementById('toastIcon');
