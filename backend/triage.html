@@ -123,7 +123,7 @@
     }
 
     /* ═══════════════════════════════════════
-   LAYOUT
+   LAYOUT & VIEWS
 ═══════════════════════════════════════ */
     .app {
       position: relative;
@@ -131,6 +131,34 @@
       display: grid;
       grid-template-columns: 64px 300px 1fr 320px;
       height: 100vh;
+    }
+
+    .view-panel {
+      display: none;
+      grid-column: 2 / -1;
+      background: var(--bg);
+      overflow-y: auto;
+      padding: 40px;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .view-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .view-sub {
+      font-size: 15px;
+      color: var(--t2);
+      margin-bottom: 32px;
     }
 
     /* ═══════════════════════════════════════
@@ -1298,6 +1326,72 @@
       </div>
     </div>
 
+
+  <!-- EVALUATION VIEW -->
+  <div class="view-panel" id="view-eval">
+    <div class="view-title">Evaluation Metrics</div>
+    <div class="view-sub">Performance report of the ML Intent Classifier and Gemini Generator.</div>
+    
+    <div class="row2">
+      <div class="glass-card">
+        <div class="gc-head">Intent Classifier Accuracy</div>
+        <div class="gc-body" style="font-size:36px; color:var(--g); font-weight:700;">97.4%</div>
+      </div>
+      <div class="glass-card">
+        <div class="gc-head">Avg Latency</div>
+        <div class="gc-body" style="font-size:36px; color:var(--p2); font-weight:700;">385ms</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION LOG VIEW -->
+  <div class="view-panel" id="view-log">
+    <div class="view-title">Decision Log</div>
+    <div class="view-sub">Audit trail of all AI-handled vs manually escalated tickets.</div>
+    <div class="glass-card">
+      <div class="gc-body">
+        <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px;">
+          <tr style="border-bottom:1px solid var(--br); color:var(--t3);">
+            <th style="padding:12px">Ticket ID</th>
+            <th style="padding:12px">Time</th>
+            <th style="padding:12px">Outcome</th>
+            <th style="padding:12px">Intent</th>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+            <td style="padding:12px; font-family:var(--mono);">#t_1184</td>
+            <td style="padding:12px; color:var(--t2);">2 mins ago</td>
+            <td style="padding:12px"><span class="chip chip-green">Auto-Replied</span></td>
+            <td style="padding:12px; color:var(--t2);">Update Issue</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+            <td style="padding:12px; font-family:var(--mono);">#t_1185</td>
+            <td style="padding:12px; color:var(--t2);">6 mins ago</td>
+            <td style="padding:12px"><span class="chip chip-amber">Escalated</span></td>
+            <td style="padding:12px; color:var(--t2);">Hardware Damage</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div class="view-panel" id="view-settings">
+    <div class="view-title">System Settings</div>
+    <div class="view-sub">Configure AI thresholds and UI preferences.</div>
+    
+    <div style="max-width:500px">
+      <div class="glass-card" style="margin-bottom:20px">
+        <div class="gc-head">AI Thresholds</div>
+        <div class="gc-body">
+          <div style="margin-bottom:12px">
+            <div style="font-size:14px; margin-bottom:8px">Intent Confidence Gate</div>
+            <input type="range" min="0" max="100" value="75" style="width:100%">
+            <div style="font-family:var(--mono); color:var(--t3); font-size:11px; margin-top:4px">Current: 0.75</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div><!-- .app -->
 
   <div id="toast">
@@ -1617,7 +1711,25 @@
     function switchView(view, btn) {
       document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      toast(`Switched to ${view}`, 'info');
+
+      const q = document.getElementById('queuePanel');
+      const s = document.getElementById('stagePanel');
+      const e = document.getElementById('evPanel');
+      const allViews = document.querySelectorAll('.view-panel');
+
+      // hide everything
+      q.classList.add('hide');
+      s.classList.add('hide');
+      e.classList.add('hide');
+      allViews.forEach(v => v.classList.remove('active'));
+
+      if (view === 'console') {
+        q.classList.remove('hide');
+        s.classList.remove('hide');
+        e.classList.remove('hide');
+      } else {
+        document.getElementById('view-' + view).classList.add('active');
+      }
     }
 
     /* ── THEME TOGGLE ── */
