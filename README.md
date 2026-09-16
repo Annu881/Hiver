@@ -4,6 +4,8 @@ A production-grade, evaluation-driven AI customer support agent built for the Hi
 
 This repository implements a robust **Retrieval-Augmented Generation (RAG)** pipeline using the Google Gemini 3.6 Flash API to draft support responses. To enforce strict safety and prevent AI hallucination, the backend incorporates an escalation gate and requires all generative drafts to be grounded in verified historical customer interactions (extracted from an AppleSupport Twitter dataset).
 
+**Live Deployment:** [https://hiver-lwmn.onrender.com/](https://hiver-lwmn.onrender.com/)
+
 ---
 
 ## 🏗️ High-Level Design (HLD)
